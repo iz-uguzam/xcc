@@ -86,10 +86,12 @@ export async function deriveEthereumAccount(
     JSON.stringify({
       keystoreJson,
       key: password,
-      accounts: [
+      derivations: [
         {
           chain: 'ETHEREUM',
           derivationPath: "m/44'/60'/0'/0/0",
+          chainId: '1',
+          network: 'MAINNET',
         },
       ],
     })
@@ -125,7 +127,6 @@ export async function signTransaction(
       JSON.stringify({
         keystoreJson,
         key: password,
-        chain: 'ETHEREUM',
         derivationPath: "m/44'/60'/0'/0/0",
         input: {
           to: txData.to,
@@ -134,8 +135,10 @@ export async function signTransaction(
           gasLimit: txData.gasLimit,
           maxFeePerGas: txData.maxFeePerGas,
           maxPriorityFeePerGas: txData.maxPriorityFeePerGas,
-          nonce: txData.nonce,
-          chainId: txData.chainId,
+          nonce: String(txData.nonce),
+          chainId: String(txData.chainId),
+          txType: '02',
+          accessList: [],
         },
       })
     )
@@ -148,15 +151,10 @@ export async function signTransaction(
  */
 export async function cacheKeystore(
   keystoreJson: string,
-  password: string
+  _password: string
 ): Promise<void> {
   await initWasm();
-  cache_keystore(
-    JSON.stringify({
-      keystoreJson,
-      key: password,
-    })
-  );
+  cache_keystore(keystoreJson);
 }
 
 /**
